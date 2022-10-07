@@ -1,0 +1,34 @@
+name: test_pipeline
+on:
+  push:
+    paths: "*"
+  schedule:
+  - cron: 0-29/10 * * * *
+env:
+  DISABLE_AUTH: 'true'
+  DB_ENGINE: mongodb
+jobs:
+  build:
+    runs-on:
+      - ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: echo message
+      run: echo "Database engine is ${{ env.DB_ENGINE }}"
+    - name: Sleep for 80 seconds
+      run: sleep 80s
+      shell: bash
+    - name: echo message
+      run: echo "DISABLE_AUTH is ${{ env.DISABLE_AUTH }}"
+  test:
+    runs-on:
+      - ubuntu-latest
+    needs: build
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - uses: actions/upload-artifact@v3
+      with:
+        name: junit-artifact
+        path: "**/target/*.xml"
